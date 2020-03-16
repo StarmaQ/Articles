@@ -1,6 +1,6 @@
 I'm sure you once were wondering how would you make the player able to drag objects around with his mouse, just like in Lumber Tycoon for example.
 
-
+![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag7.gif)
 
 It is certain that someone who had some decent knowledge with the mouse object has tried to make this by himself utilising the [`mouse.Hit`](https://developer.roblox.com/en-us/api-reference/property/Mouse/Hit) property of the mouse, which is the CFrame of the mouse in the 3D world. 
 
@@ -52,6 +52,7 @@ print(mouse.Hit.Position.Magnitude) --9986.2734375, always rounds to 9986
 
 
 ---
+---
 Side Note:
 The mouse's origin is actually the current camera's position, and in the above image it was the head. 
 
@@ -77,7 +78,7 @@ Unit vectors are vectors with a length of one, and they are used to describe dir
 
 So again, `.Unit` is the direction of the given vector (given in the form of a unit vector). After, we multiply this `mouse.Hit.Position.Unit` by a number (or also called a scalar), because remember `.Unit` gives a vector with a length of one, which is not long enough, so we have to "scale" this vector, I recommend something like 20. So to wrap it up, what we did is made a new vector with the same direction as `mouse.Hit.Position` but is only twenty-studs long.
 
-                               ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag5.gif)
+ ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag5.gif)
  After applying this to the script, we have this
 
  ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag3.gif)
