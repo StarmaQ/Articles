@@ -1,6 +1,6 @@
 I'm sure you once were wondering how would you make the player able to drag objects around with his mouse, just like in Lumber Tycoon for example.
 
-![](https://gyazo.com/cfd1aea09bac62a2be8d6a6fe958804f.gif)
+
 
 It is certain that someone who had some decent knowledge with the mouse object has tried to make this by himself utilising the [`mouse.Hit`](https://developer.roblox.com/en-us/api-reference/property/Mouse/Hit) property of the mouse, which is the CFrame of the mouse in the 3D world. 
 
@@ -34,7 +34,7 @@ mouse.Button1Up:connect(function()
 end)
 
 ```
-![drag1|690x411, 75%](upload://wYxoM5D8D9NycxfmeV88Vnw448a.gif)  
+![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag1.gif)  
 
 Great efforts! 
 
@@ -46,22 +46,23 @@ Perspective has a huge role in what's going on.
 ```
 print(mouse.Hit.Position.Magnitude) --9986.2734375, always rounds to 9986
  ``` 
-![](upload://a4QAX0wHXPGhta9f1in8k1zd6Gq.png) 
+![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag4.png) 
 
 
-[details=Side note]
+
 
 ---
+Side Note:
 The mouse's origin is actually the current camera's position, and in the above image it was the head. 
 
 For the entirety of the tutorial, I'm gonna be showing examples where the mouse's position starts from somewhere else that is not the camera because I can't really draw it from the camera's position, it would be complicated in a 2-dimensional picture. So just remember, the mouse's origin is the camera and not actually where I drew it from! 
 
 The camera's position would always be the point of view from where the player is looking, and if he's in first person the camera's position is inside of the head; which means that some of these examples might be right if you consider the player to be from a first person perspective.
 
-  ![drag8|300x300](upload://anx8xUNa0GkofioXiqPAII44Ftj.png)![drag9|300x330](upload://12EGvlSWcb5UTrdxFvjijASr6jH.png)
-
+  ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag9.png)
+  ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag10.png)
 ---
-[/details]
+
 
 
 
@@ -76,17 +77,18 @@ Unit vectors are vectors with a length of one, and they are used to describe dir
 
 So again, `.Unit` is the direction of the given vector (given in the form of a unit vector). After, we multiply this `mouse.Hit.Position.Unit` by a number (or also called a scalar), because remember `.Unit` gives a vector with a length of one, which is not long enough, so we have to "scale" this vector, I recommend something like 20. So to wrap it up, what we did is made a new vector with the same direction as `mouse.Hit.Position` but is only twenty-studs long.
 
-[spoiler],,.,.,.,.,.,.,.,.,.,.,.,,,,[/spoiler]![drag5|478x366](upload://ed14EQrNtMkJr88BP0yn7GXTpiV.gif)
+                               ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag5.gif)
  After applying this to the script, we have this
 
- ![drag3|690x411,75%](upload://bhnCHEcJpwYSNza3wOLxyUx87ts.gif)
+ ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag3.gif)
 
  Welp, it is being dragged in the air like we wanted, but it is not exactly where the mouse is. 
 
 This is happening because, the part's origin is `(0, 0, 0)` just like any part, while the mouse's origin is the camera's position (the origin in the picture down below is wrong, it can be considered right if the player was in first person). You can think of them orbiting around each of their origins which won't work out. The part is being offseted relative to `(0, 0, 0)` unlike the mouse.
 
 
- ![](upload://3I6jFRTrUi86qkzoL4Rx5ZnnK8T.png) 
+ ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag6.png) 
+ 
 In order to fix this, we have to change the part's origin to the camera by simply setting its position to the camera's position, and then offset it by the twenty-long vector. The origin of a vector isn't really a property of the Vector3 class, it's just from where your vector mathematically starts; Offsetting position A relative to position B makes position B act up like position A's origin.
  ``` 
 local camera = workspace.CurrentCamera 
@@ -98,7 +100,7 @@ mouse.Target.Position = camera.CFrame.Position + (mouse.UnitRay.Direction * 20)
 ``` 
 That's it! It actually works perfectly, we can now drag stuff in the air *like we just don't care*.
 
-![drag8|690x411,75%](upload://ehVplsHvKkkJQxJfSCJeuluajrW.gif) 
+![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag8.gif) 
 
  And of course, there are always multiple ways to achieve something. 
 
