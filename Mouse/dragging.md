@@ -7,7 +7,7 @@ It is certain that someone who had some decent knowledge with the mouse object h
 We would set whatever the current `mouse.Target`, the part that the mouse is currently hovering over, to the `mouse.Hit.Position`, the position of the mouse in the 3D world (any CFrame has a .Position or .p (.p is out-dated) property which is *just* the position of that cframe (remember that cframe is position and rotation). We can technically set the CFrame of the target straight away to mouse.Hit and not just the position but the rotation is kind of broken) each time the [`mouse.Move`](https://developer.roblox.com/en-us/api-reference/event/Mouse/Move) event fires and only when the mouse is pressing down. Also setting the [`mouse.TargetFilter`](https://developer.roblox.com/en-us/api-reference/property/Mouse/TargetFilter) to the target itself so the mouse ignores the target while calculating the `mouse.Hit` to prevent many issues. 
 
 So your attempt will look like something similar to this
-```
+```lua
 local player = game.Players.LocalPlayer --the local player
 local mouse = player:GetMouse() --his mouse
 local target --this variable will hold the part that's being currently dragged
@@ -63,7 +63,7 @@ The camera's position would always be the point of view from where the player is
   ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag9.png)
   ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag10.png)
 ---
-
+---
 
 
 
