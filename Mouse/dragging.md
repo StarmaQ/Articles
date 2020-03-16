@@ -43,7 +43,7 @@ This would work, but not totally according to the plan. The parts would always b
 Perspective has a huge role in what's going on.
 
  What's happening is, whenever you drag the mouse in the air, you'd think that the `mouse.Hit` is in the air as well. But the `mouse.Hit`, when calculated, will go in the same direction that the mouse is hovering in until it hits a surface. A way to prove that is, you try to drag it up in the air where there is no surface to land on, the part littearly dissapears because the `mouse.Hit` will go on until it hits its maximum length, so the part is really far away. You can even print the `.Magnitude` of the `mouse.Hit.Position` while hovering the mouse in empty space and you'll see that it's a large number (Any Vector3 has a .Magnitude or a .magnitude property, which is the length of the vector, magnitude is basically length, size or anything that goes along that).
-```
+```lua
 print(mouse.Hit.Position.Magnitude) --9986.2734375, always rounds to 9986
  ``` 
 ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag4.png) 
@@ -69,7 +69,7 @@ The camera's position would always be the point of view from where the player is
 
 
 Technically, in order to make this work as wanted, we would have to *limit* how much the mouse goes, so it doesn't go all the way in. To do that 
-``` 
+```lua
 mouse.Target.Position = mouse.Hit.Position.Unit * 20
 ```
  `mouse.Hit.Position.Unit` is simply the direction of the `mouse.Hit.Position` (any Vector3 has a `.Unit`  or a `.unit` property, it is the direction of that vector3), but if you wanna dig deeper, .Unit gives back a **unit vector**. 
@@ -91,12 +91,12 @@ This is happening because, the part's origin is `(0, 0, 0)` just like any part, 
  ![](https://github.com/StarmaQ/Articles/blob/master/Mouse/Imgs/drag6.png) 
  
 In order to fix this, we have to change the part's origin to the camera by simply setting its position to the camera's position, and then offset it by the twenty-long vector. The origin of a vector isn't really a property of the Vector3 class, it's just from where your vector mathematically starts; Offsetting position A relative to position B makes position B act up like position A's origin.
- ``` 
+ ```lua
 local camera = workspace.CurrentCamera 
 mouse.Target.Position = camera.CFrame.Position + (mouse.Hit.Position.Unit * 20)
  ``` 
 But even with doing this, it is kind of fixed, but still buggy. What we can do is find a better direction of the mouse, something else to replace `mouse.Hit.Position.Unit`, and for that we can use the [`UnitRay`](https://developer.roblox.com/en-us/api-reference/property/Mouse/UnitRay) property of the Mouse. This property is a ray that has the direction of the mouse, so we can probably use its `.Direction`! (again, any ray has a `.Direction` property, the direction of that ray, which I think you've guessed it, is a unit vector).
-```
+```lua
 mouse.Target.Position = camera.CFrame.Position + (mouse.UnitRay.Direction * 20) 
 ``` 
 That's it! It actually works perfectly, we can now drag stuff in the air *like we just don't care*.
@@ -107,7 +107,7 @@ That's it! It actually works perfectly, we can now drag stuff in the air *like w
 
 For instance, we could've used some raycasting with the `.UnitRay`, since this property is a ray in the first place. Using the `:FindPartOnRay()` method, we can get the position of where the ray landed, which is technically an alternative to `mouse.Hit`. We have to take count that *Unit* Ray goes only 1 stud out, so we need a longer ray. Multiplying rays or doing any math operation on them isn't possible, so we have to make a new ray, with the same `.Origin` and same `.Direction` as the unitray, but longer. 
 
-```
+```lua
 function mouseHit(distance) 
    local ray = Ray.new(mouse.UnitRay.Origin, mouse.UnitRay.Direction * distance) --as you can see, here creating a ray with the same origin (which is the camera of course) and the same direction BUT longer, whatever the distance parameter is
    local _, position = workspace:FindPartOnRay(ray)
@@ -119,13 +119,13 @@ end
  ```
  Or, we could is mess a bit with the target's cframe, and simply setting it to 20 studs from the head facing the `mouse.Hit.Position`
 
- ```
+ ```lua
  mouse.Target.Position = CFrame.new(CFrame.new(character.Head.Position, mouse.Hit.Position) * Vector3.new(0,0,-20)).Position
  ```
 And also if you want here is a much different and advanced [system](https://www.roblox.com/games/3661208893/Dragging) that you can check it out (it's uncopylocked) made by @BenSBk! 
 
  Another final thing that we can do, is make the target move more smoothly torwards the mouse by inserting a [`BodyPosition`](https://developer.roblox.com/en-us/api-reference/class/BodyForce) to it while dragging, and of course removing it after we are done, we might as well add a [`BodyGyro`](https://developer.roblox.com/en-us/api-reference/class/BodyGyro) to make it so the part's rotation doesn't freak out. A side note, body movers don't work with anchored objects, so for a substitution simply use tweening.
-```
+```lua
 local player = game.Players.LocalPlayer 
 local mouse = player:GetMouse() 
 local camera = workspace.CurrentCamera
