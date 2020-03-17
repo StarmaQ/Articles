@@ -1,1 +1,45 @@
+Metatables! Truly an interesting subject. Through my activity in different forums and discord servers, I have seen many people get confused, on what they are. Main reason being, not a super wide collection of resources exist explaining it, and in general the idea of metatables is different and unique for someone who got used to simple notation, such as loops, and if statments.
+
+**I**. Metatables
+--
+There isn't really a definition to what a metatable is. It's just that, any table can have a metatable. Stick with that idea. (and in addition, many tables can share the same metatable, a table can have multiple metatables, and a table can be its own metatable). At the end, a metatable is a table itself.
+
+The idea behind metatables is, to make tables a more powerful object! To turn them, from simple data structures, with just a small collection of abilities:
+* Storing pairs of keys and values
+* Getting values back from keys
+* The # operator
+
+into something, with way more tools in the shed:
+* All the normal abilities
+* Do arithmetic on them (division, addition, subtraction..)
+* Compare them
+* Call them like functions
+* `tostring()` them
+* And much more!
+
+![metatable1|641x500, 100%](upload://eemXC8NwUFFwSLhtw6MPHUz50yh.png) *(Image by @BenSBk)* 
+
+To set a metatable `mt` to a table `t`, you need to use `setmetatable()`, and can use `getmetatable()` to get a table's metatable if you need it.
+```
+local t = {}
+local mt = {}
+setmetatable(t, mt)
+
+print(getmetatable(t)) --returns mt, which is basically a table
+```
+An alternative, since `setmetatable()` returns the table we set the metatable of, we can do
+```
+local t = setmetatable({}, {})
+--where the second table is the metatable, that we will fill with metamethods
+```
+II. Metamethods
+--
+Metamethods are the main source of a metatable's powers. They are keys we put inside of a metatable, which I'll show you how they work in a second. They are commonly prefixed with a `__` (like `__index`, `__newindex` ect.), and most commonly set to a function (and in some special cases, set to a table or a string, we will cover these cases).
+
+We will start with the `__index` metamethod, which is one of the basic ones. `__index` can be set to a table, or a function. I'm gonna be covering the function first, because I think explaining the table part makes understanding other metamethods harder.
+```
+local t = setmetatable({}, {__index = function() end})
+```
+
+
 
