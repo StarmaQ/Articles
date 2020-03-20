@@ -76,9 +76,9 @@ Normally, `t.x` would be `nil` thus it would print `nil`, because there is no ke
 
 So, to keep it short: you can think of **metamethods as events**. An event fires when something happens, a metamethod invokes when something happens to the table its metatable is connected with.
 
-The `__index` metamethod *fires*/invokes when you index a table `t` with a value `x`, where `x` doesn't exist. (Doing t[x] or t.x, when there isn't an x). 
+The `__index` metamethod *fires*/invokes when you index a table `t` with a value `x`, where `x` doesn't exist. (Doing t[x] or t.x, when there isn't an x in t). 
 
-Just like events, when they fire they run the function they're connected to, metamethods run the function they're set to. Yet again, just like events, they give additional information through parameters that you can use, metamethods do that aswell. That's what's going on with the code above, the function is being ran, returning that message, replacing the `nil` that was supposed to be returned.
+Just like events, when they fire they run the function they're connected to, metamethods run the function they're set to. Yet again, just like events, they give additional information through parameters that you can use, metamethods do that aswell. 
 
 The `__index` metamethod gives back the table you indexed first, and the key that you indexed with second, as parameters if you wanna call them like that. (in this case, the independant `table` and `key` parameters)
 
@@ -117,7 +117,7 @@ print(t.x) --actually prints 5
 ```
 It checks if `t` contains `x`, if it doesn't, checks if `t` has a metatable, it has one `mt`, checks if `mt` has a `__index` metamethod, it does, checks if `__index`'s table contains `x`, it does, return that. Basically, `t` and `mt` share the same keys.
 
-Now for a more interesting metamethod, `__newindex`. `__newindex` fires when you try to create a new index that didn't exist. 
+Now for a more interesting metamethod, `__newindex`. `__newindex` fires when you try to create a new index that didn't exist before. (Doing t[x] = value or t.x = value, where x didn't exist before in t)
 
 III. Operator Overloading
 --
