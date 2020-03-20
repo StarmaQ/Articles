@@ -171,7 +171,7 @@ print(t1 + t2) --prints 5
 ```
 Two things to point out, order matters here as well, and also if you're wondering the metamethod will only invoke once and not twice. So yeah, you can do this with the other mathematical operations as well.
 
-You can even concatenate (using the `..` operator on strings) on tables, using `__concat`.
+You can even concatenate (using the `..` operator on strings) tables, using `__concat`.
 ```
 local t1 = {"hi", true}
 local t2 = {79, "bye", false}
