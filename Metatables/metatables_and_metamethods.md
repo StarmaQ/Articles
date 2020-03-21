@@ -118,6 +118,16 @@ print(t.x) --actually prints 5
 It checks if `t` contains `x`, if it doesn't, checks if `t` has a metatable, it has one `mt`, checks if `mt` has a `__index` metamethod, it does, checks if `__index`'s table contains `x`, it does, return that. Basically, `t` and `mt` share the same keys.
 
 Now for a more interesting metamethod, `__newindex`. `__newindex` fires when you try to create a new index that didn't exist before. (Doing t[x] = value or t.x = value, where x didn't exist before in t)
+```
+local t = setmetatable({x = 5, y = 7}, {
+     __newindex = function(t, k, value) 
+         print("This is read-only table")
+     end
+})
+
+t.z = 8 --prints that message
+```
+As you can see, you can come up with a lot of ideas. I just made a read-only table (even though you can change already existing keys). `__newindex` gives back the table, the key, and the value you wanted to set as a third parameter. Also, `__newindex` stops you from setting the value. It doesn't create the new value and run the function, it stops you from creating the function and runs the function.
 
 III. Operator Overloading
 --
@@ -192,7 +202,92 @@ setmetatable(t2, mt) --they gotta have it both as well
 local t3 = t1..t2 --we merged t1 and t2 together, as you can see you can get creative
 print(unpack(t3)) --t3 contains all of t1 and t2's members
 ```
-You also got `__lt` (less then), `__le` (less or equal to) and `__eq` (equal) which you can explore yourself. A `__mt` (more then) and `__me` (more or equal to) don't exist, but you can simply invert the usage of the already existing ones, instead of doing `a > b` do `b < a`.
+You also got `__lt` (less then), `__le` (less or equal to) and `__eq` (equal) which you can explore yourself. A `__mt` (more then) and `__me` (more or equal to) don't exist, but you can access them in a really weird way.
 
 You also got `__unm`, which is basically the inverter operator, like doing `-5`, inverse of `5`
 you can do `-table`. For example you can invert all of the table's elements.
+
+IV. Weak tables
+--
+In this section, we will be talking about `__mode`, a rather unique metamethod. We will be covering a feature that's partially disabled in Roblox, if you're interested.
+
+Before covering weak tables and `__mode`, let's talk about something else, garbage collection. Any language has a garabge collector, which is responsible for getting rid of unwanted and untracked data to prevent memory leaks. Basically, when a lua object (a table, a function, a thread (couroutines) and strings) is overwritten or removed (by setting it to nil), it's technically gone, but it's not freed from the system's memory, it's still there, but it's unreachable.
+```
+local t = {} 
+t = nil --now t is unreachable
+
+local str = "hi"
+str = "bye" --now hi is lost, it's unreachable
+```
+For lua's garbage collector, anything unreachable, meaning nothing no longer has a reference to it, is considered garbage, meaning it's a target for the garbage collector, to collect it and get rid of that uneeded *trash data*. The lua garbage collector makes a cycle automatically every once in a while, all though you can manually call `collectgarbage()` to launch a garbage collceting cycle, which will get rid of unreachables. And this is exactly the feature that roblox disables, you can not force a garbage collection, calling `collectgarbage()` will do nothing, but in a normal lua compiler it would.
+
+```
+local t = {} 
+t = nil
+
+local str = "hi"
+str = "bye" 
+
+collectgarbage() --garbage cleared!
+```
+Note that, litterals like numbers and booleans don't get garbage collected, because they don't need to. Also, we can print `collectgarbage("count")` before and after the `collectgarbage()`, and you'll see that the number decreased. This returns how much memory is used by lua in KB, and funny enough lua has this feature enabled. More [info](http://lua-users.org/wiki/GarbageCollectionTutorial) on garbage collection can be found here.
+
+Now, let's take a more complicated example
+```
+local val = {}
+local t = {x = val}
+
+val = nil
+
+collectgarbage() --you'd expect val to be collected
+
+for i, v in pairs(t) do
+    print(v) --prints the table
+end
+```
+In this code, technically the table `val` contains is unreachable, we set val to nil, and `garbagecollect()`'d. Although it's still not removed, not just from memory, but from the program itself, because it still exists inside of `t`, it's printed in the `in pairs` loop. Know why?
+As I said, an object is considered garbage if it has 0 references, but that `{}` still has a reference, it's the table containing it, it's referenced by that, so it's not considered garbage. That could be a problem. Here is where weak tables come in.
+
+A weak table is a table containing *weak references* (either weak keys, or  weak values, or both). If it's a weak reference, it will not prevent the garbage collection cycle from collecting it, if it has no other reference then the table containing it.
+
+`__mode` is responsible for making a table weak. It's the special case that I mentioned at the beginning that can be set to a string. The string can either be "v", meaning table has weak values, or "k", meaning table has weak keys. 
+
+`"v"` will let the cycle collect the key/value pair if 
+the value only has one reference and that reference is the containing table. 
+
+`"k"` will let the cycle collect the key/value pair if the key only has one reference and that reference is the containing table.
+
+```
+local val = {}
+local t = {x = val}
+
+local mt = {__mode = "v"}
+setmetatable(t, mt)
+
+val = nil --now {} only has one reference, which is t
+
+collectgarbage() 
+
+for i, v in pairs(t) do
+    print(v) --doesn't print anything, {} and it's corresponding key x are removed!
+end
+```
+I hope you understood how it works
+What if you wanted weak keys? The key would need to be the `{}`
+
+```
+local val = {}
+local t = {[val] = true}
+
+local mt = {__mode = "k"}
+setmetatable(t, mt)
+
+val = nil --now {} only has one reference, which is t
+
+collectgarbage() 
+
+for i, v in pairs(t) do
+    print(v) --doesn't print anything, {} and it's corresponding value true are removed!
+end
+```
+Let me introduce an even more complicated example
