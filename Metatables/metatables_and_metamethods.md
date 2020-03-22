@@ -89,7 +89,8 @@ After all that, we added a new power to our basic table, the ability to tell the
 
 And just like that, if you understood this, you're able to use almost any metamethod. Just like events, understand how events work in general, makes the rest easy. It's just a matter of asking "when that metamethod fires". The Roblox Dev wiki shows you all the metamethods Roblox has, describing when they fire. I am gonna be covering most of them, even though that's not needed, you can do it yourself.
 
-![image|465x500](upload://cEWP4aXb8f2MPgI8ocIsJni9frg.png) *(image from wiki)*
+![](https://github.com/StarmaQ/Articles/blob/master/Metatables/Imgs/metatable2.png)
+*(image from wiki)*
 
 I recommend you explore the code I wrote more, to get a bigger picture of what's going on. Let me remind you that you're free to do whatever you want inside of that function, you don't necessarily need to return something, or return something logical. Here is a good demonstration
 
