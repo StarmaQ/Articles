@@ -89,7 +89,7 @@ After all that, we added a new power to our basic table, the ability to tell the
 
 And just like that, if you understood this, you're able to use almost any metamethod. Just like events, understand how events work in general, makes the rest easy. It's just a matter of asking "when that metamethod fires". The Roblox Dev wiki shows you all the metamethods Roblox has, describing when they fire. I am gonna be covering most of them, even though that's not needed, you can do it yourself.
 
-![](https://github.com/StarmaQ/Articles/blob/master/Metatables/Imgs/metatable2.png)
+![](https://github.com/StarmaQ/Articles/blob/master/Metatables/Imgs/metatable5.png)
 *(image from wiki)*
 
 I recommend you explore the code I wrote more, to get a bigger picture of what's going on. Let me remind you that you're free to do whatever you want inside of that function, you don't necessarily need to return something, or return something logical. Here is a good demonstration
@@ -137,8 +137,8 @@ III. Operator Overloading
 Operator overloading is making an operator (`+`, `-`, `*` ect. `==`, `>`, `<` ect.) compatible with more than just one datatype. Meaning, you could do `num + num`, what about doing `string  + string`? Of course here we are interested in tables. Yeah! We can actually add, subtract, multiply or do any sort of arithmetic on them. Here are the metamethods responsible for operator overloading.
 
 
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable2.png)
 ![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable3.png)
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable4.png)
 
 Of course we can put many different metamethods into one metatable, like this
 ```lua
@@ -307,7 +307,7 @@ collectgarbage() --t3 and t4 get collected
 
 print(#maintab, #weaktab) --2 2
 ```
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable4.png)
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable2.png)
 
 And just wanted to mention this since it has a relation with garbage collection, there is a `__gc` metamethod, which is supposed to invoke when a table is garbage collected (the table and not a weak key/value inside of it). Although this metamethod is disabled in roblox as well.
 
