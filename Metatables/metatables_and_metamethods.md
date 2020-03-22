@@ -19,7 +19,8 @@ into something, with way more tools in the shed, using those configurations:
 * `tostring()` them
 * And much more!
 
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable1.png)*(Image by @BenSBk)* 
+![](https://github.com/StarmaQ/Articles/blob/master/Metatables/Imgs/metatable1.png) 
+*(Image by @BenSBk)* 
 
 To set a metatable `mt` to a table `t`, you need to use `setmetatable()`, and can use `getmetatable()` to get a table's metatable if you need it.
 ```lua
