@@ -137,8 +137,8 @@ III. Operator Overloading
 Operator overloading is making an operator (`+`, `-`, `*` ect. `==`, `>`, `<` ect.) compatible with more than just one datatype. Meaning, you could do `num + num`, what about doing `string  + string`? Of course here we are interested in tables. Yeah! We can actually add, subtract, multiply or do any sort of arithmetic on them. Here are the metamethods responsible for operator overloading.
 
 
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable3.png)
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable4.png)
+![e](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable3.png)
+![e](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable4.png)
 
 Of course we can put many different metamethods into one metatable, like this
 ```lua
