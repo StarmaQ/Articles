@@ -19,10 +19,10 @@ into something, with way more tools in the shed, using those configurations:
 * `tostring()` them
 * And much more!
 
-![metatable1|641x500, 100%](upload://eemXC8NwUFFwSLhtw6MPHUz50yh.png)*(Image by @BenSBk)* 
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable1.png)*(Image by @BenSBk)* 
 
 To set a metatable `mt` to a table `t`, you need to use `setmetatable()`, and can use `getmetatable()` to get a table's metatable if you need it.
-```
+```lua
 local t = {}
 local mt = {}
 setmetatable(t, mt)
@@ -30,7 +30,7 @@ setmetatable(t, mt)
 print(getmetatable(t)) --returns mt, which is basically a table
 ```
 An alternative, since `setmetatable()` returns the table we set the metatable of, we can do
-```
+```lua
 local t = setmetatable({}, {})
 --where the second table is the metatable, that we will fill with metamethods
 ```
@@ -41,7 +41,7 @@ Metamethods are the main source of a metatable's powers. They are the *"configur
 We will start with the `__index` metamethod, which is one of the basic ones. `__index` can be set to a table, or a function. I'm gonna be covering the function first, because I think explaining the table part makes understanding other metamethods harder.
 I'm gonna write a piece of code that might be hard to understand at first, but we'll examine what's happening, and break down what's going on in order to understand.
 
-```
+```lua
 local t = setmetatable({}, { 
     __index = function(table, key)
         return key.." does not exist"
@@ -53,7 +53,7 @@ print(t.x)
 
 [details="Just to get rid of confusion for beginners"]
 As I said, this is the same as 
-```
+```lua
 local t = {}
 local mt = {
     __index = function(table, key)
@@ -62,7 +62,7 @@ local mt = {
 }
  ```
 And if this still looks weird, we're basically putting a function inside of a table. `__index` is being set to a function. We can do something else like
-```
+```lua
 local t = {}
 local mt = {}
 mt.__index = function(table, key)
@@ -92,7 +92,7 @@ And just like that, if you understood this, you're able to use almost any metame
 
 I recommend you explore the code I wrote more, to get a bigger picture of what's going on. Let me remind you that you're free to do whatever you want inside of that function, you don't necessarily need to return something, or return something logical. Here is a good demonstration
 
-```
+```lua
 local adresses = {mike = "manhattan", george = "france"}
 local metatable = {
 __index = function(t, k)
@@ -109,7 +109,7 @@ print(adresses.starmaq)
 ```
 
 Also, what about the special case where `__index` can be set to a table. Well that doesn't involve any relation with events. When you set `__index` to a table, instead of running the function it's set to when it fires, it looks for the key you're looking for inside of the table `__index` is set to.
-```
+```lua
 local t = {}
 local mt = {__index = {x = 5}}
 
@@ -118,7 +118,7 @@ print(t.x) --actually prints 5
 It checks if `t` contains `x`, if it doesn't, checks if `t` has a metatable, it has one `mt`, checks if `mt` has a `__index` metamethod, it does, checks if `__index`'s table contains `x`, it does, return that. Basically, `t` and `mt` share the same keys.
 
 Now for a more interesting metamethod, `__newindex`. `__newindex` fires when you try to create a new index that didn't exist before. (Doing t[x] = value or t.x = value, where x didn't exist before in t)
-```
+```lua
 local t = setmetatable({x = 5, y = 7}, {
      __newindex = function(t, k, value) 
          print("This is read-only table")
@@ -135,11 +135,11 @@ III. Operator Overloading
 Operator overloading is making an operator (`+`, `-`, `*` ect. `==`, `>`, `<` ect.) compatible with more than just one datatype. Meaning, you could do `num + num`, what about doing `string  + string`? Of course here we are interested in tables. Yeah! We can actually add, subtract, multiply or do any sort of arithmetic on them. Here are the metamethods responsible for operator overloading.
 
 
-![image|690x197, 75%](upload://rqXBrqq1A4Uzhxz96cIlbTBeEOY.png) 
-![image|690x142, 75%](upload://lY0oMFNc4L5D7204WhmQfZCKHXJ.png) 
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable2.png)
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable3.png)
 
 Of course we can put many different metamethods into one metatable, like this
-```
+```lua
 local t = {}
 local mt = {__add = function(v1, v2) end, __sub = function(v1, v2) end, 
 __mul = function(v1, v2) end, __div = function(v1, v2) end}
@@ -148,7 +148,7 @@ setmetatable(t, mt)
 ```
 
 Let's just start with one then fill the rest.
-```
+```lua
 local t = {46, 35, 38}
 local mt = {
      __add = function(v1, v2)
@@ -163,13 +163,13 @@ Pretty amazing right? We can now add table.
 As I said earlier, you can do whatever you want inside of the function, there isn't something exact. Adding tables doesn't really have a rule, it's weird. I came up with my own way of doing it,  by adding `#t` (`#v1`), how many elements are in `t`, with `5` (`v2`). You could've done something else, like looping through `t` (`v1`) and adding all of its elements (46, 35, 38) with `5` (`v2`).
 
  Note, if I did
-```
+```lua
 print(5 + t) --this would error
 ```
 Order matters. In the first script, `t` is `v1`, and `5` is `v2`. In the second script, `5` is `v1`, `t` is `v2`, which means I'm doing `#v1`, thus `#5`, which would error. So you need to make a bunch of if statments to watch out from cases like this.
 
 Now what about adding tables? Same thing really. But both tables needs to have the `__add` metamethod. You can't add a table that has an `__add` with one that doesn't.
-```
+```lua
 local t1 = {"hi", true}
 local t2 = {79, "bye", false}
 local mt = {__add = function(v1, v2) return #v1 + #v2 end}
@@ -182,7 +182,7 @@ print(t1 + t2) --prints 5
 Two things to point out, order matters here as well, and also if you're wondering the metamethod will only invoke once and not twice. So yeah, you can do this with the other mathematical operations as well.
 
 You can even concatenate (using the `..` operator on strings) tables, using `__concat`.
-```
+```lua
 local t1 = {"hi", true}
 local t2 = {79, "bye", false}
 local mt = {
@@ -212,7 +212,7 @@ IV. Weak tables
 In this section, we will be talking about `__mode`, a rather unique metamethod. We will be covering a feature that's partially disabled in Roblox, if you're interested.
 
 Before covering weak tables and `__mode`, let's talk about something else, garbage collection. Any language has a garabge collector, which is responsible for getting rid of unwanted and untracked data to prevent memory leaks. Basically, when a lua object (a table, a function, a thread (couroutines) and strings) is overwritten or removed (by setting it to nil), it's technically gone, but it's not freed from the system's memory, it's still there, but it's unreachable.
-```
+```lua
 local t = {} 
 t = nil --now t is unreachable
 
@@ -221,7 +221,7 @@ str = "bye" --now hi is lost, it's unreachable
 ```
 For lua's garbage collector, anything unreachable, meaning nothing no longer has a reference to it, is considered garbage, meaning it's a target for the garbage collector, to collect it and get rid of that uneeded *trash data*. The lua garbage collector makes a cycle automatically every once in a while, all though you can manually call `collectgarbage()` to launch a garbage collceting cycle, which will get rid of unreachables. And this is exactly the feature that roblox disables, you can not force a garbage collection, calling `collectgarbage()` will do nothing, but in a normal lua compiler it would.
 
-```
+```lua
 local t = {} 
 t = nil
 
@@ -233,7 +233,7 @@ collectgarbage() --garbage cleared!
 Note that, I chose a string and a table because those are lua objects that get collected, litterals like numbers and booleans don't get garbage collected, because they don't need to. Also, we can print `collectgarbage("count")` before and after the `collectgarbage()`, and you'll see that the number decreased. This returns how much memory is used by lua in KB, and funny enough lua has this feature enabled. More [info](http://lua-users.org/wiki/GarbageCollectionTutorial) on garbage collection can be found here.
 
 Now, let's take a more complicated example
-```
+```lua
 local val = {}
 local t = {x = val}
 
@@ -257,7 +257,7 @@ the value only has one reference and that reference is the containing table.
 
 `"k"` will let the cycle collect the key/value pair if the key only has one reference and that reference is the containing table.
 
-```
+```lua
 local val = {}
 local t = {x = val}
 
@@ -275,7 +275,7 @@ end
 I hope you understood how it works
 What if you wanted weak keys? The key would need to be the `{}`
 
-```
+```lua
 local val = {}
 local t = {[val] = true}
 
@@ -292,7 +292,7 @@ end
 ```
 Let me introduce an even more complicated example
 
-```
+```lua
 local t1, t2, t3, t4 = {}, {}, {}, {} --4 strong references for all tables
 local maintab = {t1, t2} -- strong references to t1 and t2
 local weaktab = setmetatable({t1, t2, t3, t4}, {__mode = "v"}) --weak references for all tables
@@ -305,7 +305,7 @@ collectgarbage() --t3 and t4 get collected
 
 print(#maintab, #weaktab) --2 2
 ```
-![Sans titre|690x462, 75%](upload://iAKOWjeIe6GFoIP1hkLSuBFHo3s.png) 
+![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable4.png)
 
 And just wanted to mention this since it has a relation with garbage collection, there is a `__gc` metamethod, which is supposed to invoke when a table is garbage collected (the table and not a weak key/value inside of it). Although this metamethod is disabled in roblox as well.
 
@@ -323,7 +323,7 @@ V. Rawset, Rawget, Rawequal
 There are a lot of cases where you find yourself not wanting to do one of these three actions but don't wanna invoke a metamethod. 
 The wiki gives a really good example. Let's say you had a table, and each time you indexed something that didn't exist, you create it. The problem is, this table has a `__newindex` as well. Remember that `__newindex` stops you from setting a new value, it will not let you create that new value. In fact it will even cause an error, a C-Stack overflow, which happens when a function is called excessivly, it's `__index`'s function, being called a lot of times trying to set the value but `__newindex` is not letting it. We are not using `__newindex` on anything, we can technically remove it, but let's just say we are going to use it for something else. What do we need to do? Well, use `rawset(t, x, v)` instead of doing `t[x] = v`, which will prevent `__newindex` from invoking.
 
-```
+```lua
 local t = setmetatable({}, {
     __index = function(t, i)
         rawset(t, i, true) --there you go, just chose true as a placeholder value
@@ -341,20 +341,20 @@ VI. Strings are Tables
 --
 
 Well not really, but, suprisingly, strings can have metatables as well! Kind of weird, but it's logical I guess, considering that in binary, strings are just an array of characters. You don't have to `setmetatable()` a string's metatable, a string already has a metatable, you have to `getmetatable()` it. Really interesting in my opinion.
-```
+```lua
 local str = "starmaq"
 local mt = getmetatable(str)
 ```
 Now, a problem if I print the metatable
-```
+```lua
 print(mt)
 ```
 It prints `"The metatable is locked"`. And attempting to add any metamethod to it, will throw an error.
-```
+```lua
 mt.__index = function() end
  ```
 Well darn it, this is happening because of the `__metatable` metamethod. This metamethod prevents you from getting a table's metatable, returning something else instead. Also this metamathod will throw an error if you try to `setmetatable()` another metatable.
-```
+```lua
 local t = {}
 local mt = {__metatable = function() return "This metatable is locked" end}
 
@@ -362,7 +362,7 @@ print(getmetatable(t)) --prints the message
 setmetatable(t, {}) --errors
 ```
 Which is sad, but outside of Roblox, in a normal lua compiler, you can actually get the metatable's table, and add metamethods to it. So let's just see what we can do with that. For example, in some languages like C and C++ you can index strings, meaning if you had a string `str` equal to `"good"`, doing `str[4]` will give back `d`. In lua this isn't a thing, you'd have to do `string.sub(str, 4, 4)`, but with metatables, we can create a way to index strings.
-```
+```lua
 local str = "starmaq"
 local mt = getmetatable(str)
 mt.__index = function(s, i) return string.sub(s, i, i) end
@@ -370,14 +370,14 @@ mt.__index = function(s, i) return string.sub(s, i, i) end
 print(str[5]) --prints m, correct
 ```
 What's even crazier, all strings, wether declared already or not, share the same metatable, meaning if I indexed any other string, it would as well.
-```
+```lua
 local str2 = "goodbye"
 print(str2[6]) --y
 ```
 And you can come up with a lot of create stuff to do. 
 
 There is also something else that can have a metatable, `userdata`. A userdata is an empty allocated piece of memory with a given size. Roblox developers don't have access to create an empty userdata, because it involves a lot of [lua C api](https://www.lua.org/pil/24.html) ([info](http://www.lua.org/pil/28.1.html) on userdata if you're interested) stuff which is obviously not accessible in roblox. Although, Roblox instances (parts, scripts ect.) and some built-in objects (CFrames, Vector3s ect.) are all userdata, and all have a metatable, although it's locked.
-```
+```lua
 local part = Instance.new("Part")
 local cf = CFrame.new()
 local v3 = CFrame.new()
@@ -391,7 +391,7 @@ VII. About exploiting
 Exploiting has a big relation with metatables. This section will link between `V` and `VI`.
 
 Often, I find people asking: "Is making an if statment checking if a player's speed is big, if so kick him a good anti-speed exploit".
-```
+```lua
 if character.Humanoid.WalkSpeed > 16 then
      player:Kick("Yeet'd out of the universe")
 end
