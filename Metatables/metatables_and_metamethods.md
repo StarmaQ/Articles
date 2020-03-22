@@ -230,7 +230,7 @@ str = "bye"
 
 collectgarbage() --garbage cleared!
 ```
-Note that, litterals like numbers and booleans don't get garbage collected, because they don't need to. Also, we can print `collectgarbage("count")` before and after the `collectgarbage()`, and you'll see that the number decreased. This returns how much memory is used by lua in KB, and funny enough lua has this feature enabled. More [info](http://lua-users.org/wiki/GarbageCollectionTutorial) on garbage collection can be found here.
+Note that, I chose a string and a table because those are lua objects that get collected, litterals like numbers and booleans don't get garbage collected, because they don't need to. Also, we can print `collectgarbage("count")` before and after the `collectgarbage()`, and you'll see that the number decreased. This returns how much memory is used by lua in KB, and funny enough lua has this feature enabled. More [info](http://lua-users.org/wiki/GarbageCollectionTutorial) on garbage collection can be found here.
 
 Now, let's take a more complicated example
 ```
@@ -239,16 +239,16 @@ local t = {x = val}
 
 val = nil
 
-collectgarbage() --you'd expect val to be collected
+collectgarbage() --you'd expect {} to be collected
 
 for i, v in pairs(t) do
     print(v) --prints the table
 end
 ```
-In this code, technically the table `val` contains is unreachable, we set val to nil, and `garbagecollect()`'d. Although it's still not removed, not just from memory, but from the program itself, because it still exists inside of `t`, it's printed in the `in pairs` loop. Know why?
+In this code, technically the table `val` contains is unreachable, we set val to nil, and `garbagecollect()`'d. Although it's still not removed, not just from memory, but from the program itself, because it still exists inside of `t`, it's printed in the `pairs` loop. Know why?
 As I said, an object is considered garbage if it has 0 references, but that `{}` still has a reference, it's the table containing it, it's referenced by that, so it's not considered garbage. That could be a problem. Here is where weak tables come in.
 
-A weak table is a table containing *weak references* (either weak keys, or  weak values, or both). If it's a weak reference, it will not prevent the garbage collection cycle from collecting it, if it has no other reference then the table containing it.
+A weak table is a table containing *weak references* (either weak keys, or  weak values, or both). If it's a weak reference, it will not prevent the garbage collection cycle from collecting it, if it has no other reference then the weak table containing it.
 
 `__mode` is responsible for making a table weak. It's the special case that I mentioned at the beginning that can be set to a string. The string can either be "v", meaning table has weak values, or "k", meaning table has weak keys. 
 
@@ -291,3 +291,112 @@ for i, v in pairs(t) do
 end
 ```
 Let me introduce an even more complicated example
+
+```
+local t1, t2, t3, t4 = {}, {}, {}, {} --4 strong references for all tables
+local maintab = {t1, t2} -- strong references to t1 and t2
+local weaktab = setmetatable({t1, t2, t3, t4}, {__mode = "v"}) --weak references for all tables
+
+t1, t2, t3, t4 = nil, nil, nil, nil --no more strong references for all tables
+
+print(#maintab, #weaktab) --2 4
+
+collectgarbage() --t3 and t4 get collected
+
+print(#maintab, #weaktab) --2 2
+```
+![Sans titre|690x462, 75%](upload://iAKOWjeIe6GFoIP1hkLSuBFHo3s.png) 
+
+And just wanted to mention this since it has a relation with garbage collection, there is a `__gc` metamethod, which is supposed to invoke when a table is garbage collected (the table and not a weak key/value inside of it). Although this metamethod is disabled in roblox as well.
+
+V. Rawset, Rawget, Rawequal
+--
+
+`rawset()`, `rawget()` and `rawequal()` all have the same idea. To put it simply, they're supposed to do something without invoking a certain metamethod.
+
+ `rawset(t, x, v)` sets a key `x` with the value `v` inside of `t`. If x didn't exist before, where it would normally invoke `__newindex` if it was present, `rawset()` prevents `__newindex` from invoking. 
+
+`rawget(t, x)` will return the key `x` from table `t`. If x didn't exist, `rawget()` prevents `__index` from invoking. 
+
+`rawequal(t1, t2)` compares if table `t1` and `t2` are equal without invoking `__eq`, this can be used to check if two tables are equal the normal way.
+
+There are a lot of cases where you find yourself not wanting to do one of these three actions but don't wanna invoke a metamethod. 
+The wiki gives a really good example. Let's say you had a table, and each time you indexed something that didn't exist, you create it. The problem is, this table has a `__newindex` as well. Remember that `__newindex` stops you from setting a new value, it will not let you create that new value. In fact it will even cause an error, a C-Stack overflow, which happens when a function is called excessivly, it's `__index`'s function, being called a lot of times trying to set the value but `__newindex` is not letting it. We are not using `__newindex` on anything, we can technically remove it, but let's just say we are going to use it for something else. What do we need to do? Well, use `rawset(t, x, v)` instead of doing `t[x] = v`, which will prevent `__newindex` from invoking.
+
+```
+local t = setmetatable({}, {
+    __index = function(t, i)
+        rawset(t, i, true) --there you go, just chose true as a placeholder value
+        return t[i] 
+   end,
+   __newindex = function(t, i, v)
+
+   end
+})
+print(t[1]) -- prints true
+```
+(*code from wiki*)
+
+VI. Strings are Tables
+--
+
+Well not really, but, suprisingly, strings can have metatables as well! Kind of weird, but it's logical I guess, considering that in binary, strings are just an array of characters. You don't have to `setmetatable()` a string's metatable, a string already has a metatable, you have to `getmetatable()` it. Really interesting in my opinion.
+```
+local str = "starmaq"
+local mt = getmetatable(str)
+```
+Now, a problem if I print the metatable
+```
+print(mt)
+```
+It prints `"The metatable is locked"`. And attempting to add any metamethod to it, will throw an error.
+```
+mt.__index = function() end
+ ```
+Well darn it, this is happening because of the `__metatable` metamethod. This metamethod prevents you from getting a table's metatable, returning something else instead. Also this metamathod will throw an error if you try to `setmetatable()` another metatable.
+```
+local t = {}
+local mt = {__metatable = function() return "This metatable is locked" end}
+
+print(getmetatable(t)) --prints the message
+setmetatable(t, {}) --errors
+```
+Which is sad, but outside of Roblox, in a normal lua compiler, you can actually get the metatable's table, and add metamethods to it. So let's just see what we can do with that. For example, in some languages like C and C++ you can index strings, meaning if you had a string `str` equal to `"good"`, doing `str[4]` will give back `d`. In lua this isn't a thing, you'd have to do `string.sub(str, 4, 4)`, but with metatables, we can create a way to index strings.
+```
+local str = "starmaq"
+local mt = getmetatable(str)
+mt.__index = function(s, i) return string.sub(s, i, i) end
+
+print(str[5]) --prints m, correct
+```
+What's even crazier, all strings, wether declared already or not, share the same metatable, meaning if I indexed any other string, it would as well.
+```
+local str2 = "goodbye"
+print(str2[6]) --y
+```
+And you can come up with a lot of create stuff to do. 
+
+There is also something else that can have a metatable, `userdata`. A userdata is an empty allocated piece of memory with a given size. Roblox developers don't have access to create an empty userdata, because it involves a lot of [lua C api](https://www.lua.org/pil/24.html) ([info](http://www.lua.org/pil/28.1.html) on userdata if you're interested) stuff which is obviously not accessible in roblox. Although, Roblox instances (parts, scripts ect.) and some built-in objects (CFrames, Vector3s ect.) are all userdata, and all have a metatable, although it's locked.
+```
+local part = Instance.new("Part")
+local cf = CFrame.new()
+local v3 = CFrame.new()
+
+print(getmetatable(part)) --"The metatable is locked"
+print(getmetatable(cf)) --"The metatable is locked"
+print(getmetatable(v3)) --"The metatable is locked"
+```
+VII. About exploiting
+--
+Exploiting has a big relation with metatables. This section will link between `V` and `VI`.
+
+Often, I find people asking: "Is making an if statment checking if a player's speed is big, if so kick him a good anti-speed exploit".
+```
+if character.Humanoid.WalkSpeed > 16 then
+     player:Kick("Yeet'd out of the universe")
+end
+```
+The answer is no. Because exploiters can change what the WalkSpeed shows up as. His walkspeed can be `10000`, but scripts view it as `16`. How? Well, as I said, Roblox instances (humanoid in this case) have a metatable, using `__index`, the expoiter can check when a property is indexed (doing `Humanoid.WalkSpeed` for example) and if so return 16, instead of letting Roblox return the actual walkspeed. But also, I said Roblox instances' metatable is locked, you can't add metamethods to it, well, most exploits have the lua debug library, which contains a function that can get a metatable without invoking `__metatable`, which is `debug.getmetatable`, otherwise called `getrawmetatable()` (get**raw**metatable, just like the other raw functions that do something withou invoking a metamethods). And with this combination, you can trick scripts, and sometimes it might ruin sanity checks in the client side.
+
+---------
+
