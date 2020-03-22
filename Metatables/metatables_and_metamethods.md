@@ -307,7 +307,7 @@ collectgarbage() --t3 and t4 get collected
 
 print(#maintab, #weaktab) --2 2
 ```
-![](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable2.png)
+![d](https://github.com/StarmaQ/Articles/edit/master/Metatables/Imgs/metatable2.png)
 
 And just wanted to mention this since it has a relation with garbage collection, there is a `__gc` metamethod, which is supposed to invoke when a table is garbage collected (the table and not a weak key/value inside of it). Although this metamethod is disabled in roblox as well.
 
