@@ -34,7 +34,7 @@ There isn't one exact way to serialize, you just have to get creative and invent
 
 * What about properties that are set to `Enum` values? These ones might be tricky! The way I did it was by `tostring()`ing it, then since `Enum`s have each part seperated with a `.` (for example `Enum.Material.Plastic`), I can do `string.split` on it where `"."` is the seperater, and like that I have a table containing `{"Enum", "Material", "Plastic"}`, then what I do is save the 2nd and 3rd index, and when I deserialize, since `Enum.Something` is the same as `Enum["Something"]`, I can do `Enum[t[1]][t[2]]`, where `t` is the saved table containing `"Material"` and `"Plastic"`, and `t[1]` is `"Material"` and `t[2]` is `"Plastic"`.
 
-![serializer1|690x232](upload://8Acsz5ey5VmO3njyzddahWKb1db.png) 
+![serializer1|690x232](https://github.com/StarmaQ/Articles/blob/master/Serialization/Imgs/serializer1.png) 
 
 Again! All this might sound complicated, but it will be made clearer later on in the code!
 
@@ -144,7 +144,7 @@ end
 
 If we were to `game.HttpSerivce:JSONEncode()` the returned table (we're gonna use this even more) and printed.
 We will get this:
-![image|690x201](upload://n7vhYbIF5K8ak69G8WirahZMiqa.png) 
+![image|690x201](https://github.com/StarmaQ/Articles/blob/master/Serialization/Imgs/serializer2.png) 
 Pretty cool right? You can see the serialized stuff.
 
 And finally, we can wrap all this into one beautiful and basic function named `Encrypt` which is going to be the one we mainly use.
@@ -215,8 +215,8 @@ end
 We can now `:GetAsync()` the saved JSON string, and decrypt it to spawn the objects back!
 And we're done! Hooray! 
 
-I took the liberty to turn it into a [module](http://d) and create a place to test it out, it's fully commented (besides the serializer module) and you can download it!
-[serializer_place.rbxl|attachment](upload://70GNECIhChAb7Q0yAlBseuo8RSt.rbxl) (25.8 KB) 
+I took the liberty to turn it into a [module](https://github.com/StarmaQ/Articles/blob/master/Serialization/serializer.lua) and create a place to test it out, it's fully commented (besides the serializer module) and you can download it!
+[Here](https://github.com/StarmaQ/Articles/blob/master/Serialization/serializer_place.rbxl)
 
 
 ```lua
