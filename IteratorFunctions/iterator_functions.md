@@ -1,4 +1,4 @@
-
+1
 In this article we'll be covering an important [chapter](https://www.lua.org/pil/7.1.html) of the lua pil, iterator functions.
 You might've encountered this term before, when mentioning either `pairs` or `ipairs`.
 
@@ -44,3 +44,9 @@ for v in xpairs({"hi",true,3,4}) do
 end
 ```
 `v` is the current element returned by `iterator`, you can see here we only have one piece of info which is the current value, unlike `next` which returns the current index and its value. If I wanted to do that, I would replace the return line by `return idx,t[idx]`.
+
+`II. Iterator examples`
+--
+Now that we know how to properly write iterators, we can write even more iterators!
+
+Let's start by trying to make a replica of `pairs`. Wait, haven't we already done that with `xpairs`? Well there are some key features that `pairs`, or I should actually say `next`, and we don't. For example, with `next`, if you had a table like this `{1, 2, nil, 3}`, it actually traverses through the whole table ignoring `nil` at index 3 and carrying on later to the 4th index (which is `3`) and stops. With our `iterator` in `xpairs`, we would stop as soon as we return nil, when we get to index 3 it returns nil and stops looping even though there is more ahead. How would we do that? Well since `# 
