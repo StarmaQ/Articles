@@ -42,3 +42,5 @@ You can see exactly what we talked about put into action. The factory is called 
 for v in xpairs({"hi",true,3,4}) do
     print(v) -- actually prints the elements of the table 
 end
+```
+`v` is the current element returned by `iterator`, you can see here we only have one piece of info which is the current value, unlike `next` which returns the current index and its value. If I wanted to do that, I would replace the return line by `return idx,t[idx]`.
