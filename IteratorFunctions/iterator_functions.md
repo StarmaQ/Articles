@@ -132,3 +132,23 @@ end
 ```
 What about an interesting iterator
 ```
+local GetProperties(obj)
+  local properties = {"Name","Anchored", "Transparency"} --keep a list of the properties that you wanna include when looping
+  local idx = 0 
+  
+  local function iterator()
+    idx = idx + 1
+    local property = properties[idx] --the current property
+    return property, obj[property] --return the property's name and the property's value, obj[property] is basically the same as obj.property (e.g. obj.Transparency can be written obj["Tansparency"])
+  end
+  return iterator
+end
+
+for property, value in GetProperties(workspace.Part) do
+  print(property, value)
+end
+```
+Anyways, let's continue!
+
+`III. Stateless iterators`
+--
