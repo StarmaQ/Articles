@@ -164,4 +164,5 @@ function: 0x1016460 table: 0x101c350 nil
 ```
 Wait.. It returns three things? Did I lie to you this whole time by telling you that it returns an iterator function and just that? 
 
-Well, this whole time we were using **stateful** iterators. Stateful iterators are iterators that keep their state. What does that mean? It's the `idx` variable we always used. With stateful iterators, you keep your state internally, you're the one who takes care of it by creating it and incrementing it. With stateless iterators, you don't keep your state, it's given to you. Given by who? Well the generic for loop, but we'll talk about that later. Let's demonstrate 
+Well, this whole time we were using **stateful** iterators. Stateful iterators are iterators that keep their state. What does that mean? It's the `idx` variable we always used. With stateful iterators, you keep your state internally, you're the one who takes care of it by creating it and incrementing it. With stateless iterators, you don't keep your state, it's given to you. Given by who? Well the generic for loop, but we'll talk about that later. Let's demonstrate what I mean.
+I'm gonna define a simple factory and iterator function. I'm not gonna use them in a for loop, I'm just gonna 
