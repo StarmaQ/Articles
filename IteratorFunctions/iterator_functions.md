@@ -184,4 +184,10 @@ print(iter()) --3
 ```
 As you see, this is a stateful iterator, it keeps its state internally. Whenever we call it we don't need to pass an argument or anything, it just knows what value to return next because it's the one keeping the state.
 
-I think I made it clear earlier that `pairs` is -oh wait- `next` is a stateless iterator.
+I think I made it clear earlier that `pairs` is -oh wait- `next` is a stateless iterator. Remember at the start, `next` needs to get passed the previous index, meaning the state, as a second argument. It's statless! It doesn't save the state, it's given to it. 
+
+Ok so we just talked about all this theoretically, let's write actual code. I'm gonna forget about `pairs` because it's a bad example, I'm gonna write my own factory with a stateless iterator. As we've seen with `pairs`, a factory with a stateless iterator returns three things: the stateless iterator itself, the *invariant* which is basically the inputted table to iterate through (the table won't be affected or changed which is why it's called the invariant) and the *control variable* which is technically speaking our state, at first we need to return the initial starting control variable, basically the starting value for the state which in most cases we covered is 0. Basically in our factory, we need to return these three things for the generic for loop to use. In return, each iteration the stateless iterator gets passed the invariant and previous control variable as arguments (exactly why it's stateless) in order to determine the next value, increment the control variable, and return the current value and the invariant and the incremenred control variable. And just like stateful it will keep on looping until the iterator returns nil. Let's re-write our `xpairs` so it returns a stateless iterators.
+
+```
+
+
