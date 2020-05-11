@@ -182,3 +182,6 @@ print(iter()) --1
 print(iter()) --2
 print(iter()) --3
 ```
+As you see, this is a stateful iterator, it keeps its state internally. Whenever we call it we don't need to pass an argument or anything, it just knows what value to return next because it's the one keeping the state.
+
+I think I made it clear earlier that `pairs` is -oh wait- `next` is a stateless iterator.
