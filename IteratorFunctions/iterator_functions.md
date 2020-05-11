@@ -49,4 +49,66 @@ end
 --
 Now that we know how to properly write iterators, we can write even more iterators!
 
-Let's start by trying to make a replica of `pairs`. Wait, haven't we already done that with `xpairs`? Well there are some key features that `pairs`, or I should actually say `next`, and we don't. For example, with `next`, if you had a table like this `{1, 2, nil, 3}`, it actually traverses through the whole table ignoring `nil` at index 3 and carrying on later to the 4th index (which is `3`) and stops. With our `iterator` in `xpairs`, we would stop as soon as we return nil, when we get to index 3 it returns nil and stops looping even though there is more ahead. How would we do that? Well since `# 
+Let's start by trying to make a replica of `pairs`. Wait, haven't we already done that with `xpairs`? Well there are some key features that `pairs`, or I should actually say `next`, and we don't. For example, with `next`, if you had a table like this `{1, 2, nil, 3}`, it actually traverses through the whole table ignoring `nil` at index 3 and carrying on later to the 4th index (which is `3`) and stops. With our `iterator` in `xpairs`, we would stop as soon as we return nil, when we get to index 3 it returns nil and stops looping even though there is more ahead. How would we do that? Well since `#{1,2,nil,3}` is actually `4` and not `3`, we can simply check if the current value is nil and we still haven't hit the length of the table yet (e.g. `idx` ~= `#t`), if so, we increment `idx` yet again, until there is no nil and we hit the table's length.
+```lua
+local function xpairs(t) --I called the factory xpairs
+    local idx = 0
+    local function iterator()
+        idx = idx + 1
+        while t[idx] == nil and idx ~= #t do --as long as the value is nil and we're not done
+          idx = idx + 1 --keep on adding one, this while loop will stop as soon as we hit a non-nil value 
+        end
+        return t[idx]
+    end
+    return iterator
+end
+```
+And you'll see that it works! What about `keys`? `next` can traverse the dictionarry part of a table, how would we do that? Well, unfortunately, we can't. There isn't really a way to get back the keys of a table in plain lua. How does `next` do it then? Let me remind you that any gloabl lua function (e.g. `print`, `unpack`, `pairs`...) is written in the C-side of lua, meaning it's written in the C language, which means they might have stuff that we don't have access to in lua.
+
+What if I wanted to implement `ipairs`? Well funny enough the first `xpairs` we wrote does exactly what `ipairs` does! `ipairs` will iterate through only the array part of the table (meaning the values with numerical indices) and ignore the dictionarry part (keys), which is also what we're not doing. Also, `ipairs` stops as soon as it hits a nil value, even if there is more ahead, which is also what we were doing. `ipairs` doesn't return `next`, it returns a different iterator, which is obvious since as you can see it has a different behaviour. We don't really know the name of the iterator that it returns.
+
+Let's try implementing more stuff! 
+
+Let's make an iterator that iterates through every character in a string.
+```lua
+local function spairs(str) 
+  local idx = 0 
+  local function iterator()
+    idx = idx + 1
+    if idx <= #str then --as long as we didn't hit the string's length, if we did then the iterator will return nothing, in otherwords return nil and the loop stops
+      return idx, string.sub(str, idx, idx) --this is a way to return a certain character of a string, I hope you understand it
+    end
+  end
+  return iterator
+end
+
+for i, char in spairs("starmaq101") do
+  print(i, char)
+end
+```
+
+`string.gmatch` is a factory in fact, and it returns an iterator which iterates through every matching string with the pattern you gave. [Info](https://devforum.roblox.com/t/how-do-i-use-string-gmatch/313386)
+```lua
+for match in string.gmatch("hi hiya hiyo", "hi") do
+
+end
+```
+How would we create one? Well very simple. Utilising the third argument of `string.match`, which is from where to start searching for matches, we can keep a state variable just like `idx`, we would check the first time for any matches with the given pattern, if one exists we would keep track of where that match ended, and return it, and keep on searching depending on the state variable.
+```lua
+local function gmatch(str, pattern)
+  local last = 1 --this is our state, from where we should search
+  local function iterator()
+    local match = string.match(str, pattern, last) --this is the current match
+    if match then --if a match existed, then we'll return it
+        last = select(2,string.find(str, match, last))+1 --this is how I determine the next position to search from, string.finding where the current match using the previous last as the third argument, string.find returns two things, the start position of the found match and the end position as the second reutnred value, I use `select` to select the returned value I want, which is the second, hence I do select(2, the two values string.find returns), and of course I add 1 to it so we start searching after it
+        return match
+    end
+  end
+  return iterator
+end
+
+for match in gmatch("ghi, hi", "%l+") do --%l+ is a string patterns, it's basically saying grab each set of letters, which are ghi and hi
+  print(match)
+end
+```
+
