@@ -112,3 +112,23 @@ for match in gmatch("ghi, hi", "%l+") do --%l+ is a string patterns, it's basica
 end
 ```
 
+And you can get creative with this however you want! What if I wanted to make a an iterator which only goes through string values of a table
+```lua
+local function OnlyStrings(t) 
+  local idx = 0
+  local function iterator()
+    idx = idx + 1
+    while type(t[idx]) ~= "string" do
+      idx = idx + 1
+    end
+    return t[idx]
+  end
+  return iterator
+end
+
+for v in OnlyStrings({2,"hi",true,"hgf","kno"}) do
+    print(v)
+end
+```
+What about an interesting iterator
+```
