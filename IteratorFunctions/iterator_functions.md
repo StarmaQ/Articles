@@ -211,7 +211,7 @@ for i, v in next, {1,2,3,4}, nil do
   
 end
 ```
-These are really just the values that `pairs({1,2,3,4})` would've returned, but instead of writing that we write what it returns straight away, it's just some way to pretend to be like an epic scripter. Note that the `, nil` could've been omitted. 
+These are really just the values that `pairs({1,2,3,4})` would've returned, but instead of calling pairs to get those we write them straight away, it's just some way to pretend to be like an epic scripter and confuse beginners. Note that the `, nil` could've been omitted. 
 
 Also don't you find it confusing that `pairs` returns nil as an initial control variable? That's why I said it was a bad example. Well `pairs` is written in the C-side as I said so we can't really know what's happening. But logically, it does this so it can make looping through keys and numerical indices at the same time easy or something.
 
