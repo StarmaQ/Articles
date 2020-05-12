@@ -224,7 +224,7 @@ Also don't you find it confusing that `pairs` returns nil as an initial control 
 
 Also, what about stateful iterators? When a factory returns only a stateful iterator doesn't that disrespect the fact that the `in x do` part takes three values? Well really, if it's not returning anything for those two values, it's kind of like returning nil, so basically nil and nil are being passed to the iterator function, and since we are not using them anyways it's not a problem.
 
-So, which is better to use, a stateful iterator or a stateless iterator? Well use which one you find fitting. It's a choice really. Personally I find stateless iterators cooler due to the notion of being passed the previous index. The only disadvantage to stateless iterators, as I said earlier, you are forced to return an index (state) first along with a value, if you wanted to make an iterator that only returns the value and not the index well you have to use statefuls.
+So, which is better to use, a stateful iterator or a stateless iterator? Well use which one you find fitting. It's a choice really. Personally I find stateless iterators cooler due to the notion of being passed the previous index. The only disadvantage to stateless iterators, as I said earlier, you are forced to return an index (state) first along with a value, if you wanted to make an iterator that only returns the value and not the index well you have to use statefuls. 
 
 Anywho! Let's move on and try to re-write some of the previous iterators we wrote earlier to transform them into stateless ones. The loop through a string one.
 ```lua
@@ -244,7 +244,7 @@ end
 ```
 
 The `OnlyStrings` one
-```
+```lua
 local function OnlyStrings(t) 
   local function iterator(inva, ctrl)
     ctrl = ctrl + 1
@@ -261,3 +261,6 @@ for i, v in OnlyStrings({2,"hi",true,"hgf","kno"}) do
 end
 ``` 
 For practice try re-writing some of these.
+
+`IV. Iterators with complex state`
+--
