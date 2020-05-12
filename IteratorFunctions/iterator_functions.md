@@ -346,7 +346,7 @@ end
 ```
 This almost looks like that the body of the for loop is a function where each element is passed as an argument to that function each time. If I were to write this using `table.foreach`, I would do this
 ```lua
-local function f(v) 
+local function f(v) --v is the elemet from the table each time
   if v > 10 then 
     print(tostring(v).." is greater than 10)
   else
@@ -357,4 +357,8 @@ end
 table.foreach(t, f) --where t is some table
 ```
 
-`table.foreach
+`table.foreach` does the iteration on its own, it doesn't need a for loop to do so. Cool right? For that reason we call `table.foreach` and `table.foreachi` are called *true iterators*, they are actual iterators that do the iteration on their own, unlike the iterators we have been talking about this whole time that are just plugged in a generic for loop.
+
+----
+
+That's it! I hope you found this article informative (without doubt it is) and as usual, have a wonderful day!
