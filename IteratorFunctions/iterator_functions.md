@@ -95,7 +95,7 @@ end
 ```
 How would we create one? Well very simple. Utilising the third argument of `string.match`, which is from where to start searching for matches, we can keep a state variable just like `idx`, we would check the first time for any matches with the given pattern, if one exists we would keep track of where that match ended, and return it, and keep on searching depending on the state variable.
 ```lua
-local function gmatch(str, pattern)
+local function gmatch(str, pattern) --you can pass more than a table
   local last = 1 --this is our state, from where we should search
   local function iterator()
     local match = string.match(str, pattern, last) --this is the current match
@@ -191,9 +191,10 @@ Ok so we just talked about all this theoretically, let's write actual code. I'm 
 ```lua
 local function xpairs(t)
   local function iterator(invariant, control) --each iteration, the table and the previous control variable are passed as arguments
-    control = control + 1 --we increment the control variable each time, at the furst iteration the control variable will be 0, we increment it so it becomes 1 use it and return it, so in the next iteration we get passed 1 increment it again so it's 2 and so on.
+    control = control + 1 --we increment the control variable each time, at the first iteration the control variable will be 0, we increment it so it becomes 1 use it and return it, so in the next iteration we get passed 1 increment it again so it's 2 and so on.
     if control <= #invariant then --we have to add this now beacuse we are returning the index as I explained at the start
         return control, invariant[control] --we return the current index so it's passed again in the next iteration and the pieces of info which is the value in this case
+    end
   end
   return iterator, t, 0 
 end
@@ -266,3 +267,66 @@ For practice try re-writing some of these.
 --
 With stateless iterators, you can only pass two things as an argument to the iterator which are the invariant and the control variable. What if you wanted to pass more info? For example let's say you have an iterator which will loop through a table and stop until it's done iterating through all the elements or it iterated through 4 odd numbers that were inside of that table. You need to keep a state to keep track of how many odds there have been. Well we can do what we do with stateful iterators and store that state within the factory (an upvalue would be a better term).
 ```lua
+local function LoopUntil4Odds(t) 
+  local odds = 0 
+  
+  local function iterator(inva, ctrl)
+    ctrl = ctrl + 1 
+    
+    if odds ==4 then
+      return 
+    end 
+    
+    if ctrl <= #inva then 
+      if inva[ctrl]%2 ~= 0 then --if it's odd
+        odds = odds + 1
+      end
+      return ctrl, inva[ctrl], odds --additionally I return how many odds there are each time
+    end
+  end
+  return iterator, t, 0
+end 
+```
+But we don't wanna do that, there is a mix of statefulness and statelessness in there, we want to be a fully stateless iterator.
+
+Well, I hope you realise that the invariant and control variable arguments that are passed can be anything, they don't need to be precisly a table and a number. Using that fact, can we pack the invariant and control variable into one thing, say a dictionarry, so it's like `{inva = t, ctrl = 0}`, this dictionarry will be returned by the factory instead of the invariant, and nil is returned instead of the control variable. That dictionarry will be passed to the iterator as an argument instead of the invariant. Let's see what I'm talking about.
+```lua
+local function xpairs(t)
+  local function iterator(dict) --dict is what's in the invariant's place which is the dictionarry
+    dict.ctrl = dict.ctrl + 1 
+    if dict.ctrl <= #dict.inva then 
+        return dict.ctrl, dict.inva[dict.ctrl]
+    end
+  end
+  return iterator, {inva = t, ctrl = 0}, nil --the initial values are put into a dictionarry, note that the ", nil" can be omitted
+end
+```
+As you can see, `{inva = t, ctrl = 0}` is gonna be passed as an invariant each time, and each iteration we increment the ctrl key by 1, and since the invariant doesn't change there is no problem. This is actually a way to bypass the fact that you need to return an index with a stateless iterator.
+Remember that the invariant and the control variable are both considered states, here instead of having two seperate states, we have one complex one.
+
+We can definitely pack more info into that dictionarry. We can store more states into it, like the `odds` state. It's initial value is gonna be 0 of course.
+
+```lua
+local function LoopUntil4Odds(t) 
+  local function iterator(dict)
+    dict.ctrl = dict.ctrl + 1 
+    
+    if dict.odds == 4 then
+      return 
+    end 
+    
+    if dict.ctrl <= #dict.inva then 
+      if dict.inva[dict.ctrl]%2 ~= 0 then
+        dict.odds = dict.odds + 1
+      end
+      return dict.ctrl, dict.inva[dict.ctrl], dict.odds
+    end
+  end
+  return iterator, {inva = t, ctrl = 0, odds = 0}, nil
+end
+
+for i, v, odds in LoopUntil4Odds({1,2,3,4,5,6,7,8,9}) do 
+  print(i, v, odds)
+end
+```
+
