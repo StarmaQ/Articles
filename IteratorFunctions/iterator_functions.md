@@ -186,20 +186,34 @@ As you see, this is a stateful iterator, it keeps its state internally. Whenever
 
 I think I made it clear earlier that `pairs` is -oh wait- `next` is a stateless iterator. Remember at the start, `next` needs to get passed the previous index, meaning the state, as a second argument. It's statless! It doesn't save the state, it's given to it. 
 
-Ok so we just talked about all this theoretically, let's write actual code. I'm gonna forget about `pairs` because it's a bad example, I'm gonna write my own factory with a stateless iterator. As we've seen with `pairs`, a factory with a stateless iterator returns three things: the stateless iterator itself, the *invariant* which is basically the inputted table to iterate through (the table won't be affected or changed which is why it's called the invariant) and the *initial control variable* which is technically speaking our state, starting control variable, basically the starting value for the state which in most cases we covered is 0. Basically in our factory, we need to return these three things for the generic for loop to use. In return, each iteration the stateless iterator gets passed the invariant and previous control variable as arguments (exactly why it's stateless) in order to determine the next value, increment the control variable, return the wanted pieces of info and carry on. And just like stateful it will keep on looping until the iterator returns nil. Let's re-write our `xpairs` so it returns a stateless iterator.
+Ok so we just talked about all this theoretically, let's write actual code. I'm gonna forget about `pairs` because it's a bad example, I'm gonna write my own factory with a stateless iterator. As we've seen with `pairs`, a factory with a stateless iterator returns three things: the stateless iterator itself, the *invariant* which is basically the inputted table to iterate through (the table won't be affected or changed which is why it's called the invariant) and the *control variable* which is technically speaking our state, at first we need to return the initial starting control variable, basically the starting value for the state which in most cases we covered is 0. Basically in our factory, we need to return these three things for the generic for loop to use. In return, each iteration the stateless iterator gets passed the invariant and previous control variable as arguments (exactly why it's stateless) in order to determine the next value, increment the control variable, and return the current value and the invariant and the incremenred control variable. And just like stateful it will keep on looping until the iterator returns nil. Let's re-write our `xpairs` so it returns a stateless iterators.
 
 ```lua
-
 local function xpairs(t)
-  local function iterate(invariant, control) --the invariant is the table being iterated and control is the control variable aka stats each iteration, they're passed to iterate by the generic for loop each time
-    control = control + 1 --increment it
-    return invariant[control] --return the value, I could've replcaed invariant with t, because they're the same and invariant doesn't change it's "invariant"
+  local function iterator(invariant, control) --each iteration, the table and the previous control variable are passed as arguments
+    control = control + 1 --we increment the control variable each time, at the furst iteration the control variable will be 0, we increment it so it becomes 1 use it and return it, so in the next iteration we get passed 1 increment it again so it's 2 and so on.
+    return invariant[control], invariant, control --we return the value
   end
-  
-  return iterate, t, 0 --we return the iterator, the table to iterate aka the invariant, and the initial control variable aka initial state which as we saw at the start of the article is 0, we wanna start as 0
+  return iterator, t, 0 
 end
-  
-for v in xpairs({1,2,3,4}) do 
+
+for v in xpairs({1,2,3,4}) do
   print(v) -- actually prints the elements of the table sequently
 end
-``` 
+```
+Fascinating!
+If we were to break down what's happening, the factory `xpairs` first returns the invariant which is `{1,2,3,4}` and initial control variable which is 0, so `{1,2,3,4}` and `0` are passed to `iterator`, iterator increments control variable, uses it and returns the current value, and the next iteration the incremented control variable is passed again which is 1, and you get the picture.
+When I said the stateful version of `xpairs` is a replica of `ipairs` I kind of lied because `ipairs` returns a stateless iterator just like `pairs`. `string.gmatch` for example returns a stateful iterator. How do I know that? Well if you printed what it returns you can see it just returns a function.
+Sometimes you'd see people writing something fancy like this
+
+```lua
+for i, v in next, {1,2,3,4}, nil do
+  
+end
+```
+These are really just the values that `pairs({1,2,3,4})` would've returned, but instead of writing that we write what it returns straight away, it's just some way to pretend to be like an epic scripter. Note that the `, nil` could've been omitted. 
+
+Also don't you find it confusing that `pairs` returns nil as an initial control variable? That's why I said it was a bad example. Well `pairs` is written in the C-side as I said so we can't really know what's happening. But logically, it does this so it can make looping through keys and numerical indices at the same time easy or something.
+
+
+
