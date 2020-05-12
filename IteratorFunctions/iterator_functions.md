@@ -215,5 +215,10 @@ These are really just the values that `pairs({1,2,3,4})` would've returned, but 
 
 Also don't you find it confusing that `pairs` returns nil as an initial control variable? That's why I said it was a bad example. Well `pairs` is written in the C-side as I said so we can't really know what's happening. But logically, it does this so it can make looping through keys and numerical indices at the same time easy or something.
 
+Also, what about stateful iterators? When a factory returns only a stateful iterator doesn't that disrespect the fact that the `in x do` part takes three values? Well really, if it's not returning anything for those two values, it's kind of like returning nil, so basically nil and nil are being passed to the iterator function, and since we are not using them anyways it's not a problem.
 
+So, which is better to use, a stateful iterator or a stateless iterator? Well use which one you find fitting. It's a choice really. Personally I find stateless iterators cooler due to the notion of being passed the previous index. 
+
+Anywho! Let's move on and try to re-write some of the previous iterators we wrote earlier to transform them into stateless ones. The loop through a string one.
+```lua
 
