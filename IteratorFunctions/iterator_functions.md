@@ -264,3 +264,5 @@ For practice try re-writing some of these.
 
 `IV. Iterators with complex state`
 --
+With stateless iterators, you can only pass two things as an argument to the iterator which are the invariant and the control variable. What if you wanted to pass more info? For example let's say you have an iterator which will loop through a table and stop until it's done iterating through all the elements or it iterated through 4 odd numbers that were inside of that table. You need to keep a state to keep track of how many odds there have been. Well we can do what we do with stateful iterators and store that state within the factory (an upvalue would be a better term).
+```lua
