@@ -43,7 +43,7 @@ for v in xpairs({"hi",true,3,4}) do
     print(v) -- actually prints the elements of the table sequently
 end
 ```
-`v` is the current element returned by `iterator`, you can see here we only have one piece of info which is the current value, unlike `next` which returns the current index and its value. If I wanted to do that, I would replace the return line by `return idx,t[idx]`.
+`v` is the current element returned by `iterator`, you can see here we only have one piece of info which is the current value, unlike `next` which returns the current index and its value. If I wanted to do that, I would replace the return line by `return idx,t[idx]` and additionally check if we hit the table's length yet (e.g. `idx == #t`) because `t[idx]` would be nil if we're out but `idx` is gonna be always an increasing number thus not only nil is returned and the loop keeps on going.
 
 `II. Iterator examples`
 --
@@ -221,4 +221,17 @@ So, which is better to use, a stateful iterator or a stateless iterator? Well us
 
 Anywho! Let's move on and try to re-write some of the previous iterators we wrote earlier to transform them into stateless ones. The loop through a string one.
 ```lua
+local function spairs(str)
+  local function iterator(inva, ctrl)
+    ctrl = ctrl + 1 
+    if ctrl <= #inva then
+      return ctrl, string.sub(inva,ctrl,ctrl)
+    end
+  end
+  return iterator,str,0 
+end
 
+for i, char in spairs("starmaq101") do
+  print(i, char)
+end
+```
