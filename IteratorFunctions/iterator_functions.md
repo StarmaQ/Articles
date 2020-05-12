@@ -330,3 +330,31 @@ for i, v, odds in LoopUntil4Odds({1,2,3,4,5,6,7,8,9}) do
 end
 ```
 
+`V. True iterators` 
+--
+Isn't it weird that we call iterator functions *iterators* even though they aren't the ones doing the iteration, the generic for loop does . The iterator function just determines what value to return next, the generic for loop uses it to do the iteration. That's why the lua PIL prefers to give the iterator name to the generic for loop. What would we name the previously-named iterator function then? Well the lua PIL likes to call them *generators*, because they generate the next value.
+
+Did you know that at a certain point in lua generic for loops didn't exist yet? You had to use `table.foreach` (`table.foreachi` exists as well which is equivilant to `ipairs`) instead. Essentially, it takes two parameters, the table to iterate through, and a function to apply to each element. So if you had something arbitrary like this in the modern lua
+```lua 
+for i, v in pairs(t) do --where t is some table
+  if v > 10 then 
+    print(tostring(v).." is greater than 10)
+  else
+    print(tostring(v).." is less than 10)
+  end
+end
+```
+This almost looks like that the body of the for loop is a function where each element is passed as an argument to that function each time. If I were to write this using `table.foreach`, I would do this
+```lua
+local function f(v) 
+  if v > 10 then 
+    print(tostring(v).." is greater than 10)
+  else
+    print(tostring(v).." is less than 10)
+  end
+end
+
+table.foreach(t, f) --where t is some table
+```
+
+`table.foreach
