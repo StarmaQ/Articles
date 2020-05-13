@@ -338,19 +338,19 @@ Did you know that at a certain point in lua generic for loops didn't exist yet? 
 ```lua 
 for i, v in pairs(t) do --where t is some table
   if v > 10 then 
-    print(tostring(v).." is greater than 10)
+    print(tostring(v).." is greater than 10")
   else
-    print(tostring(v).." is less than 10)
+    print(tostring(v).." is less than 10")
   end
 end
 ```
 This almost looks like that the body of the for loop is a function where each element is passed as an argument to that function each time. If I were to write this using `table.foreach`, I would do this
 ```lua
-local function f(v) --i is the index of the element each time and v is the elemet from the table each time
+local function f(i, v) --i is the index of the element each time and v is the elemet from the table each time
   if v > 10 then 
-    print(tostring(v).." is greater than 10)
+    print(tostring(v).." is greater than 10")
   else
-    print(tostring(v).." is less than 10)
+    print(tostring(v).." is less than 10")
   end
 end
 
