@@ -1,10 +1,9 @@
-local module = {} --I made it into a module
+local module = {}
 
 local HttpService = game:GetService("HttpService")
 local Properties = {
 Part = {"Name", "Position", "Size", "Transparency", "BrickColor", "CanCollide", "CFrame", "Anchored", "Shape", "Material"},
-Decal = {"Name", "Texture", "Transparency", "Face", "Color3"},
-WeldConstraint = {"Name", "Part0", "Part1", "Enabled"}
+Decal = {"Name", "Texture", "Transparency", "Face", "Color3"}
 }
 
 function Serialize(prop)
@@ -66,7 +65,7 @@ function InitProps(objects)
 	return tableToSave
 end
 
-local function create(parent, t)
+local function Create(parent, t)
 	for class, _ in pairs(t) do
 		for _, obj in pairs(t[class]) do
 			local object = Instance.new(class)
@@ -74,7 +73,7 @@ local function create(parent, t)
 				if prop ~= "Children" then
 					object[prop] = Deserialize(prop, value)
 				else
-					create(object, value)
+					Create(object, value)
 				end
 			end
 			object.Parent = parent
@@ -83,15 +82,15 @@ local function create(parent, t)
 end
 
 
-function module.Encrypt(objects)
+function module.Encode(objects)
 	return HttpService:JSONEncode(InitProps(objects))
 end
 
 
-function module.Decrypt(dic, slot)
+function module.Decode(dic, slot)
 	local t = HttpService:JSONDecode(dic)
 	
-	create(slot, t)
+	Create(slot, t)
 end
 
 
