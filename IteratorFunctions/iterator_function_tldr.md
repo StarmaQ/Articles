@@ -1,4 +1,4 @@
-Basically, `pairs` and `ipairs` are called factories, and they return something called an *iterator function*. An iterator function is 
+Basically, `pairs` and `ipairs` are called factories (a factory is any function that returns another function), and they return something called an *iterator function*. An iterator function is 
 used to determine the next value to return. `pairs` returns `next`, it's the one used by the generic for loop to determine the next value each time.
 
 ```lua
