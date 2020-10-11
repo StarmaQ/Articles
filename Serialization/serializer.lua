@@ -1,23 +1,22 @@
 local module = {}
 
-local HttpService = game:GetService("HttpService")
 local Properties = {
 Part = {"Name", "Position", "Size", "Transparency", "BrickColor", "CanCollide", "CFrame", "Anchored", "Shape", "Material"},
 Decal = {"Name", "Texture", "Transparency", "Face", "Color3"}
 }
 
-function Serialize(prop)
-	local typ = typeof(prop)
+local function Serialize(prop)
+	local type = typeof(prop)
 	local r 
-	if typ == "BrickColor" then
+	if type == "BrickColor" then
 		r = tostring(prop)
-	elseif typ == "CFrame" then
+	elseif type == "CFrame" then
 		r = {pos = Serialize(prop.Position), rX = Serialize(prop.rightVector), rY = Serialize(prop.upVector), rZ = Serialize(-prop.lookVector)}
-	elseif typ == "Vector3" then
+	elseif type == "Vector3" then
 		r = {X = prop.X, Y = prop.Y, Z = prop.Z}
-	elseif typ == "Color3" then
+	elseif type == "Color3" then
 		r = {Color3.toHSV(prop)}
-	elseif typ == "EnumItem" then
+	elseif type == "EnumItem" then
 		r = {string.split(tostring(prop), ".")[2], string.split(tostring(prop), ".")[3]}
 	else
 		r = prop
@@ -25,7 +24,7 @@ function Serialize(prop)
 	return r
 end
 
-function Deserialize(prop, value)
+local function Deserialize(prop, value)
 	local r 
 	if prop == "Position" or prop == "Size" then
 		r = Vector3.new(value.X, value.Y, value.Z)
@@ -43,7 +42,7 @@ function Deserialize(prop, value)
 	return r
 end
 
-function InitProps(objects)
+local function InitProps(objects)
 	local tableToSave = {}
 	for _, obj in pairs(objects) do
 		local class = obj.ClassName
@@ -53,8 +52,8 @@ function InitProps(objects)
 			t = tableToSave[class]
 		end
 		local add = {}
-		for _, Prop in pairs(Properties[obj.ClassName]) do
-			add[Prop] = Serialize(obj[Prop])
+		for _, prop in pairs(Properties[obj.ClassName]) do
+			add[prop] = Serialize(obj[prop])
 		end
 		local children = obj:GetChildren()
 		if #children > 0 then
@@ -83,14 +82,12 @@ end
 
 
 function module.Encode(objects)
-	return HttpService:JSONEncode(InitProps(objects))
+	return InitProps(objects)
 end
 
 
-function module.Decode(dic, slot)
-	local t = HttpService:JSONDecode(dic)
-	
-	Create(slot, t)
+function module.Decode(dic, slot)	
+	Create(slot, dic)
 end
 
 
